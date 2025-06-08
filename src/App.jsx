@@ -1,35 +1,121 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+
+import ContactList from "./Components/ContactList";
+import Header from "./Components/Header";
+import ContactForm from "./Components/ContactForm";
+import ErrorBoundary from "./Components/ErrorBoundary";
+
+import data from "./data.json";
+import { v4 as uuidv4 } from "uuid";
+
+import {
+  Toolbar,
+  AppBar,
+  Container,
+  createTheme,
+  ThemeProvider,
+  Button,
+} from "@mui/material";
+import { lightBlue } from "@mui/material/colors";
+import { NavLink, Route, Routes, useNavigate } from "react-router";
+import EditForm from "./Components/EditForm";
+
+const theme = createTheme({
+  palette: {
+    primary: lightBlue,
+    secondary: {
+      main: "#1976d2",
+      light: "#42a5f5",
+      dark: "#1565c0",
+      contrastText: "#fff",
+    },
+  },
+});
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [contacts, setContacts] = useState(data);
+  const navigate = useNavigate();
+
+  function deleteContact(id) {
+    setContacts(contacts.filter((contact) => contact.id !== id));
+  }
+
+  function addContact(newContact) {
+    setContacts([...contacts, { ...newContact, id: uuidv4() }]);
+  }
+
+  function updateContact(updatedContact) {
+    setContacts(
+      contacts.map((contact) =>
+        String(contact.id) === String(updatedContact.id)
+          ? updatedContact
+          : contact
+      )
+    );
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <ThemeProvider theme={theme}>
+        <AppBar position="static">
+          <Toolbar>
+            <Button color="inherit" component={NavLink} to="/">
+              Contacts
+            </Button>
+            <Button color="inherit" component={NavLink} to="/addContact">
+              Add Contact
+            </Button>
+          </Toolbar>
+        </AppBar>
+
+        <Container sx={{ mt: 4 }}>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <Header title="Contacts" />
+                  <ErrorBoundary>
+                    <ContactList contacts={contacts} onDelete={deleteContact} />
+                  </ErrorBoundary>
+                </>
+              }
+            />
+            <Route
+              path="/addContact"
+              element={
+                <>
+                  <Header title="Contact Form" />
+                  <ContactForm
+                    onSave={addContact}
+                    onCancel={() => {
+                      navigate("/");
+                    }}
+                    onReturnToList={() => {
+                      navigate("/");
+                    }}
+                  />
+                </>
+              }
+            />
+
+            <Route
+              path="/editContact/:id"
+              element={
+                <EditForm
+                  contacts={contacts}
+                  onCancel={() => {
+                    navigate("/");
+                  }}
+                  onSave={updateContact}
+                />
+              }
+            />
+          </Routes>
+        </Container>
+      </ThemeProvider>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
