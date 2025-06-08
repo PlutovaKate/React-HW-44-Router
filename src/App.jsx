@@ -3,7 +3,11 @@ import { useState } from "react";
 import ContactList from "./Components/ContactList";
 import Header from "./Components/Header";
 import ContactForm from "./Components/ContactForm";
+import EditForm from "./Components/EditForm";
 import ErrorBoundary from "./Components/ErrorBoundary";
+
+import AddIcon from "@mui/icons-material/Add";
+import PermContactCalendarIcon from "@mui/icons-material/PermContactCalendar";
 
 import data from "./data.json";
 import { v4 as uuidv4 } from "uuid";
@@ -18,7 +22,6 @@ import {
 } from "@mui/material";
 import { lightBlue } from "@mui/material/colors";
 import { NavLink, Route, Routes, useNavigate } from "react-router";
-import EditForm from "./Components/EditForm";
 
 const theme = createTheme({
   palette: {
@@ -61,9 +64,11 @@ function App() {
           <Toolbar>
             <Button color="inherit" component={NavLink} to="/">
               Contacts
+              <PermContactCalendarIcon />
             </Button>
             <Button color="inherit" component={NavLink} to="/addContact">
               Add Contact
+              <AddIcon />
             </Button>
           </Toolbar>
         </AppBar>
